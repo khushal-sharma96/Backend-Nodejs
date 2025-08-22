@@ -1,21 +1,29 @@
 const express = require('express');
 const router = express.Router();
-
 const { body } = require('express-validator');
-const AdditionalSignerController = require('../controllers/additionalSigner.controller');
+const controller = require('../controllers/additionalSigner.controller');
 
-router.get('/', authMiddleware, AdditionalSignerController.getSigner);
+// Add additional signer to session
+router.post(
+  '/add/:sessionId',
+  [
+    body('fullName').isLength({ min: 3 }).withMessage('Full name is required'),
+    body('email').isEmail().withMessage('Valid email is required')
+  ],
+  controller.add
+);
 
-router.post('/add', [
-    body('email').isEmail().withMessage('Invalid email address'),
-    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be atleast 3 letters long'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be atleast 8 characters long'),
-], AdditionalSignerController.addSigner);
+// Update additional signer at specific index
+router.put(
+  '/edit/:sessionId',
+  [
+    body('fullName').isLength({ min: 3 }).withMessage('Full name is required'),
+    body('email').isEmail().withMessage('Valid email is required')
+  ],
+  controller.update
+);
 
-router.put('/edit/:id', [
-    body('email').isEmail().withMessage('Invalid email address'),
-    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be atleast 3 letters long'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be atleast 8 characters long'),
-], AdditionalSignerController.editSigner);
+// Delete additional signer at index
+router.delete('/:sessionId/:additional_id', controller.remove);
 
 module.exports = router;

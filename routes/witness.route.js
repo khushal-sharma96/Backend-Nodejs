@@ -1,21 +1,32 @@
 const express = require('express');
 const router = express.Router();
-
 const { body } = require('express-validator');
-const WitnessController = require('../controllers/witness.controller');
+const controller = require('../controllers/witness.controller');
 
-router.get('/', authMiddleware, WitnessController.getSigner);
+router.post(
+    '/add/:sessionId',
+    [
+        body('fullName').isLength({ min: 3 }).withMessage('Full name is required'),
+        body('email').isEmail().withMessage('Valid email is required'),
+        body('zip').notEmpty().withMessage('ZIP is required'),
+        body('address').notEmpty().withMessage('Address is required'),
+        body('state').notEmpty().withMessage('State is required')
+    ],
+    controller.add
+);
 
-router.post('/add', [
-    body('email').isEmail().withMessage('Invalid email address'),
-    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be atleast 3 letters long'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be atleast 8 characters long'),
-], WitnessController.addSigner);
+router.put(
+    '/edit/:sessionId',
+    [
+        body('fullName').isLength({ min: 3 }).withMessage('Full name is required'),
+        body('email').isEmail().withMessage('Valid email is required'),
+        body('zip').notEmpty().withMessage('ZIP is required'),
+        body('address').notEmpty().withMessage('Address is required'),
+        body('state').notEmpty().withMessage('State is required')
+    ],
+    controller.update
+);
 
-router.put('/edit/:id', [
-    body('email').isEmail().withMessage('Invalid email address'),
-    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be atleast 3 letters long'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be atleast 8 characters long'),
-], WitnessController.editSigner);
+router.delete('/:sessionId/:witness_id', controller.remove);
 
 module.exports = router;
