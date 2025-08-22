@@ -1,21 +1,38 @@
 const express = require('express');
 const router = express.Router();
-
 const { body } = require('express-validator');
-const ObserverController = require('../controllers/observer.controller');
+const controller = require('../controllers/observer.controller');
 
-router.get('/', authMiddleware, ObserverController.getSigner);
+router.post(
+    '/add/:sessionId',
+    [
+        body('fullName').notEmpty().withMessage('Full name is required'),
+        body('email').isEmail().withMessage('Valid email is required'),
+        body('phone').notEmpty().withMessage('Phone is required'),
+        body('role').notEmpty().withMessage('Role is required'),
+        body('otherRole')
+            .if(body('role').equals('other'))
+            .notEmpty()
+            .withMessage('Other Contact Role is required when role is "Other"')
+    ],
+    controller.add
+);
 
-router.post('/add', [
-    body('email').isEmail().withMessage('Invalid email address'),
-    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be atleast 3 letters long'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be atleast 8 characters long'),
-], ObserverController.addSigner);
+router.put(
+    '/edit/:sessionId',
+    [
+        body('fullName').notEmpty().withMessage('Full name is required'),
+        body('email').isEmail().withMessage('Valid email is required'),
+        body('phone').notEmpty().withMessage('Phone is required'),
+        body('role').notEmpty().withMessage('Role is required'),
+        body('otherRole')
+            .if(body('role').equals('Other'))
+            .notEmpty()
+            .withMessage('Other Contact Role is required when role is "Other"')
+    ],
+    controller.update
+);
 
-router.put('/edit/:id', [
-    body('email').isEmail().withMessage('Invalid email address'),
-    body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be atleast 3 letters long'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be atleast 8 characters long'),
-], ObserverController.editSigner);
+router.delete('/:sessionId/:observer_id', controller.remove);
 
 module.exports = router;
